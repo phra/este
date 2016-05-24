@@ -48,6 +48,7 @@ class Users extends Component {
 // Are you scared of many higher order components? Remember, these HOC's
 // are just functions and can be composed ad-hoc later when patterns emerge :-)
 
+// TODO: Add custom 404.
 Users = loading(Users, ['users']);
 
 Users = queryFirebase(Users, props => ({

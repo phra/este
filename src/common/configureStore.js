@@ -1,7 +1,6 @@
-import Firebase from 'firebase';
 import appReducer from './app/reducer';
 import createLogger from 'redux-logger';
-import isomorphicFetch from 'isomorphic-fetch';
+import fetch from 'isomorphic-fetch';
 import promiseMiddleware from 'redux-promise-middleware';
 import shortid from 'shortid';
 import storageDebounce from 'redux-storage-decorator-debounce';
@@ -27,7 +26,7 @@ const injectMiddleware = deps => ({ dispatch, getState }) => next => action =>
     : action
   );
 
-// Reset app state on logout, stackoverflow.com/q/35622588/233902.
+// Reset app state on logout, stackoverflow.com/q/35622588/233902
 const resetOnLogout = (reducer, initialState) => (state, action) => {
   if (action.type === LOGOUT) {
     state = {
@@ -48,23 +47,18 @@ export default function configureStore(options) {
     platformMiddleware = []
   } = options;
 
+  // TODO: Refactor into configureStorage
   const engineKey = `redux-storage:${initialState.config.appName}`;
   const engine = createEngine && createEngine(engineKey);
-  const firebase = new Firebase(initialState.config.firebaseUrl);
-  // // Check whether connection works.
-  // firebase.child('hello-world').set({
-  //   createdAt: Firebase.ServerValue.TIMESTAMP
-  // });
 
   const middleware = [
     injectMiddleware({
       ...platformDeps,
       engine,
-      fetch: isomorphicFetch,
-      firebase,
+      fetch,
       getUid: () => shortid.generate(),
       now: () => Date.now(),
-      validate
+      validate,
     }),
     promiseMiddleware({
       promiseTypeSuffixes: ['START', 'SUCCESS', 'ERROR']

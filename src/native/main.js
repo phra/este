@@ -11,7 +11,7 @@ import { Provider } from 'react-redux';
 const initialState = {
   config: {
     appName: config.appName,
-    firebaseUrl: config.firebaseUrl
+    firebase: config.firebase
   },
   intl: {
     currentLocale: config.defaultLocale, // TODO: Detect native locale.

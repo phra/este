@@ -1,4 +1,5 @@
 // bluebirdjs.com/docs/why-bluebird.html
+// Note require usage, it's required before babel-polyfill.
 const Bluebird = require('bluebird');
 
 // Warnings are useful for user code, but annoying for third party libraries.

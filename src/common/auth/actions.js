@@ -51,13 +51,13 @@ export function login(fields) {
 }
 
 export function logout() {
-  return ({ engine, firebase }) => {
+  return ({ engine, firebaseAuth }) => {
     // Always redirect to home first to ensure valid view state after logout.
     if (process.env.IS_BROWSER) {
       browserHistory.replace('/');
     }
     engine.save({}); // Always reset client storage.
-    firebase.unauth();
+    firebaseAuth().signOut();
     return {
       type: LOGOUT
     };

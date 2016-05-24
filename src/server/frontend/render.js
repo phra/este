@@ -1,9 +1,9 @@
-import 'babel-polyfill';
 import Helmet from 'react-helmet';
 import Html from './Html.react';
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import config from '../config';
+import configureFirebase from '../../common/configureFirebase';
 import configureStore from '../../common/configureStore';
 import createRoutes from '../../browser/createRoutes';
 import loadMessages from '../intl/loadMessages';
@@ -14,6 +14,7 @@ import { queryFirebaseServer } from '../../common/lib/redux-firebase/queryFireba
 import { routerMiddleware, syncHistoryWithStore } from 'react-router-redux';
 
 const messages = loadMessages();
+const firebaseDeps = configureFirebase(config.firebase.server);
 
 const getInitialState = req => {
   const currentLocale = process.env.IS_SERVERLESS
@@ -24,8 +25,8 @@ const getInitialState = req => {
     config: {
       appName: config.appName,
       appVersion: config.appVersion,
-      firebaseUrl: config.firebaseUrl,
-      sentryUrl: config.sentryUrl
+      firebase: { client: config.firebase.client },
+      sentryUrl: config.sentryUrl,
     },
     intl: {
       currentLocale,
@@ -92,6 +93,7 @@ export default function render(req, res, next) {
   const memoryHistory = createMemoryHistory(req.originalUrl);
   const store = configureStore({
     initialState,
+    platformDeps: { ...firebaseDeps },
     platformMiddleware: [routerMiddleware(memoryHistory)]
   });
   const history = syncHistoryWithStore(memoryHistory, store);

@@ -19,9 +19,9 @@
 
 import * as actions from './actions';
 import Component from 'react-pure-render/component';
-import Firebase from 'firebase';
 import React, { PropTypes } from 'react';
 import invariant from 'invariant';
+// import bluebirdjs
 
 const onError = error => console.log(error); // eslint-disable-line no-console
 const ensureArrayWithDefaultOnError = item => {
@@ -72,7 +72,7 @@ export default function queryFirebase(Wrapped, mapPropsToOptions) {
                 }
                 action({
                   eventType,
-                  key: snapshot.key(),
+                  key: snapshot.key,
                   prevChildKey,
                   val: snapshot.val()
                 });
@@ -92,8 +92,6 @@ export default function queryFirebase(Wrapped, mapPropsToOptions) {
       // Example: { path: product && `products/${product.id}`, ... }
       if (!options.path) return;
       this.context.store.dispatch(({ firebase }) => {
-        invariant(firebase instanceof Firebase,
-          'Expected the firebase to be an instance of Firebase.');
         invariant(typeof options.path === 'string',
           'Expected the path to be a string.');
         const ref = firebase.child(options.path);
@@ -175,6 +173,7 @@ export default function queryFirebase(Wrapped, mapPropsToOptions) {
   };
 }
 
+// TODO: Link to file.
 // queryFirebaseServer is for server side data fetching. Example:
 // await queryFirebaseServer(() => {
 //   // Render app calls componentWillMount on every rendered component, so
@@ -192,9 +191,12 @@ export const queryFirebaseServer = renderAppCallback => {
     console.log(e); // eslint-disable-line no-console
   } finally {
     serverFetching = false;
-    // Wait until all promises in an array are either rejected or fulfilled.
-    // http://bluebirdjs.com/docs/api/reflect.html
-    const promises = serverFetchingPromises.map(promise => promise.reflect());
+    const promises = serverFetchingPromises
+      // Reflect ensures one failed promise will not break whole query.
+      // http://bluebirdjs.com/docs/api/reflect.html
+      // TODO: https://github.com/este/este/issues/917
+      // Should be fixed pretty soon.
+      .map(promise => promise/*.reflect()*/);
     serverFetchingPromises = null;
     return Promise.all(promises); // eslint-disable-line no-unsafe-finally
   }
